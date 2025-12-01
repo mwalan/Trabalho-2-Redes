@@ -1,0 +1,11 @@
+server.py: Handles socket connections, client threads, and the game loop.
+client.py: The Pygame frontend that connects to the server.
+logic.py: Pure Python Uno rules (Deck, Validation, State) used by the server.
+network.py: Protocol helper for sending/receiving JSON messages.
+security.py: Handles simplified encryption (Caesar/XOR for demo or Fernet placeholders) and Auth tokens.
+
+
+Server: Manages global state, turn logic, and rules.
+Client: Handles Pygame UI and input.
+Network: Handles sockets and synchronization.
+Security: Implements Login/Token and simulated E2E encryption for chat.
