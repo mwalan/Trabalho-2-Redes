@@ -8,11 +8,26 @@ from protocolo import EstadoJogo
 
 # Configuração de Rede
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client.connect(('localhost', 5555))
+
+# Pergunta o IP do servidor para permitir conexão em LAN
+print("=== Configuração de Conexão ===")
+server_ip = input("Digite o IP do servidor (pressione Enter para localhost): ").strip()
+if not server_ip:
+    server_ip = 'localhost'
+
+try:
+    client.connect((server_ip, 5555))
+except Exception as e:
+    print(f"Não foi possível conectar ao servidor em {server_ip}:5555")
+    print(f"Erro: {e}")
+    exit()
+
 meu_id = pickle.loads(client.recv(4096))
 
 # Configuração Pygame
-pygame.init()
+# Inicializamos apenas vídeo e fonte para evitar erros de áudio (ALSA) no Linux/WSL
+pygame.display.init()
+pygame.font.init()
 WIDTH, HEIGHT = 800, 600
 win = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption(f"UNO - Jogador {meu_id}")

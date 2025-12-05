@@ -6,10 +6,11 @@ import threading
 import pickle
 from protocolo import EstadoJogo
 
-HOST = 'localhost'
+HOST = '0.0.0.0'
 PORT = 5555
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # Permite reiniciar o servidor rapidamente
 server.bind((HOST, PORT))
 server.listen()
 print(f"Servidor UNO rodando em {HOST}:{PORT}")
