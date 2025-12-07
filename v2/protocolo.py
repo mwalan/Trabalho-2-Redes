@@ -3,10 +3,11 @@ ARQUIVO: protocolo.py
 FUNÇÃO: Definir as regras, estruturas de dados e o estado compartilhado do jogo.
 IMPORTÂNCIA: Este arquivo é a "verdade absoluta" do jogo. Tanto o servidor quanto o cliente
 precisam ter exatamente a mesma versão deste arquivo para que a serialização (pickle) funcione.
+DESCRIÇÃO: Contém a classe Carta, a classe EstadoJogo (que encapsula toda a lógica do UNO)
+e as constantes de mensagens de rede.
 """
 
-import random
-import pickle
+import random   # Usado para embaralhar o baralho
 
 # --- CONSTANTES DO JOGO ---
 # Definem as propriedades básicas das cartas
@@ -15,6 +16,7 @@ VALORES = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'PULAR', 'INVERTER'
 ESPECIAIS = ['CORINGA', '+4']
 
 # --- TIPOS DE MENSAGEM (REDE) ---
+# Constantes usadas para identificar o tipo de ação enviada pela rede
 MSG_ENTRAR_SALA = 'ENTRAR_SALA'
 MSG_CRIAR_SALA = 'CRIAR_SALA'
 MSG_LISTAR_SALAS = 'LISTAR_SALAS'
@@ -62,7 +64,8 @@ class EstadoJogo:
         self.embaralhar()
         topo = self.baralho.pop()
         self.descarte.append(topo)
-        self.cor_atual = topo.cor if topo.cor != 'PRETO' else 'VERMELHO' # Default se começar com preta
+        # Se a primeira carta for preta, define vermelho como padrão, senão usa a cor da carta
+        self.cor_atual = topo.cor if topo.cor != 'PRETO' else 'VERMELHO'
 
     def criar_baralho(self):
         """Gera todas as cartas do baralho padrão do UNO."""
@@ -99,6 +102,7 @@ class EstadoJogo:
             self.maos[id_jogador].append(carta)
             
             # Se comprou e ficou com mais de 1 carta, perde o status de UNO (se tivesse)
+            # Isso evita que alguém grite UNO, compre carta e continue "safe" com 2 cartas
             if len(self.maos[id_jogador]) != 1 and id_jogador in self.uno_safe:
                 self.uno_safe.remove(id_jogador)
                 
@@ -118,9 +122,9 @@ class EstadoJogo:
             topo = self.descarte[-1] # A carta que está atualmente no topo da mesa
 
             # --- REGRAS DE VALIDAÇÃO ---
-            # 1. Mesma cor (da carta ou da cor ativa)
-            # 2. Mesmo valor/símbolo
-            # 3. Carta do jogador é preta (Coringa/+4)
+            # 1. Mesma cor (da carta ou da cor ativa na mesa)
+            # 2. Mesmo valor/símbolo (ex: 7 no 7, Pular no Pular)
+            # 3. Carta do jogador é preta (Coringa/+4) - sempre pode jogar
             match_cor = carta.cor == self.cor_atual or carta.cor == 'PRETO'
             match_valor = carta.valor == topo.valor
             
@@ -142,6 +146,7 @@ class EstadoJogo:
                     return True
 
                 # Se ficou com 1 carta, precisa gritar UNO (reseta status safe)
+                # O jogador deve clicar no botão UNO imediatamente
                 if len(mao) == 1 and id_jogador in self.uno_safe:
                     self.uno_safe.remove(id_jogador)
                 
@@ -153,6 +158,7 @@ class EstadoJogo:
                 
                 elif carta.valor == 'INVERTER':
                     if len(self.jogadores_conectados) == 2:
+                        # Em 2 jogadores, Inverter funciona como Pular
                         pular_vez = True
                     else:
                         self.sentido_horario = not self.sentido_horario
@@ -164,6 +170,7 @@ class EstadoJogo:
                     proximo_idx = (self.jogador_atual + passo) % total
                     id_proximo = self.jogadores_conectados[proximo_idx]
                     
+                    # Vítima compra 2 cartas e perde a vez
                     self.comprar_carta(id_proximo)
                     self.comprar_carta(id_proximo)
                     pular_vez = True
@@ -175,6 +182,7 @@ class EstadoJogo:
                     proximo_idx = (self.jogador_atual + passo) % total
                     id_proximo = self.jogadores_conectados[proximo_idx]
                     
+                    # Vítima compra 4 cartas e perde a vez
                     for _ in range(4):
                         self.comprar_carta(id_proximo)
                     pular_vez = True
@@ -182,6 +190,7 @@ class EstadoJogo:
                 if pular_vez:
                     self.avancar_turno()
                 
+                # Passa a vez para o próximo jogador
                 self.avancar_turno()
                 return True
         return False
