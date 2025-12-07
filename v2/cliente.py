@@ -184,7 +184,7 @@ def receber_dados():
                     # Confirmação de entrada na sala
                     meu_id = msg['id']
                     em_sala = True
-                    pygame.display.set_caption(f"UNO - Jogador {meu_id}")
+                    # A atualização do caption será feita no loop principal para evitar crash
             
             # Se for uma instância de EstadoJogo, é a atualização completa do jogo
             elif isinstance(msg, EstadoJogo):
@@ -559,9 +559,19 @@ run = True
 clock = pygame.time.Clock()
 enviar_acao({'tipo': MSG_LISTAR_SALAS}) # Pede lista inicial de salas ao conectar
 ultimo_update = time.time()
+ultimo_estado_sala = False
 
 while run:
     clock.tick(60) # Limita a 60 FPS
+    
+    # Atualiza caption se mudou de sala/lobby
+    if em_sala != ultimo_estado_sala:
+        if em_sala and meu_id is not None:
+             pygame.display.set_caption(f"UNO - Jogador {meu_id}")
+        else:
+             pygame.display.set_caption("UNO Multiplayer - Lobby")
+        ultimo_estado_sala = em_sala
+
     mouse_pos = pygame.mouse.get_pos()
     
     # Atualização automática da lista de salas no lobby (polling a cada 1s)
