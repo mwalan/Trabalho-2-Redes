@@ -20,7 +20,6 @@ ESPECIAIS = ['CORINGA', '+4']
 MSG_ENTRAR_SALA = 'ENTRAR_SALA'
 MSG_CRIAR_SALA = 'CRIAR_SALA'
 MSG_LISTAR_SALAS = 'LISTAR_SALAS'
-MSG_ATUALIZAR_SALA = 'ATUALIZAR_SALA' # Servidor -> Cliente (dentro da sala)
 MSG_INICIAR_JOGO = 'INICIAR_JOGO'
 MSG_GRITAR_UNO = 'GRITAR_UNO'
 MSG_SAIR_SALA = 'SAIR_SALA'
@@ -46,8 +45,7 @@ class EstadoJogo:
     Classe principal que armazena todo o estado do jogo num determinado momento.
     O servidor mantém uma instância desta classe e envia cópias dela para os clientes.
     """
-    def __init__(self, modo_jogo):
-        self.modo_jogo = modo_jogo # Modos: '2P' (2 Jogadores), '4P' (4 Jogadores), 'DUPLAS'
+    def __init__(self):
         self.baralho = self.criar_baralho() # Lista de cartas disponíveis para compra
         self.descarte = [] # Pilha de cartas jogadas na mesa
         self.maos = {} # Dicionário mapeando ID do jogador -> Lista de Cartas

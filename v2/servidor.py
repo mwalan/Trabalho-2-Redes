@@ -11,13 +11,13 @@ import socket   # Biblioteca para comunicação de rede (TCP/IP)
 import threading # Biblioteca para lidar com múltiplos clientes simultaneamente (Threads)
 import pickle   # Biblioteca para serialização de objetos (enviar dados complexos pela rede)
 # Importa as constantes e classes compartilhadas do protocolo
-from protocolo import EstadoJogo, MSG_CRIAR_SALA, MSG_ENTRAR_SALA, MSG_LISTAR_SALAS, MSG_ATUALIZAR_SALA, MSG_INICIAR_JOGO, MSG_GRITAR_UNO, MSG_SAIR_SALA, MSG_ERRO
+from protocolo import EstadoJogo, MSG_CRIAR_SALA, MSG_ENTRAR_SALA, MSG_LISTAR_SALAS, MSG_INICIAR_JOGO, MSG_GRITAR_UNO, MSG_SAIR_SALA, MSG_ERRO
 
 # --- CONFIGURAÇÃO DO SERVIDOR ---
 HOST = '0.0.0.0' # Escuta em todas as interfaces de rede disponíveis
 PORT = 5555      # Porta onde o servidor vai rodar
 
-# Cria o socket do servidor
+# Cria o socket do servidor (AF_INET = IPv4, SOCK_STREAM = TCP)
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Permite reutilizar o endereço/porta imediatamente após fechar (evita erro "Address already in use")
 server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -33,7 +33,7 @@ print(f"Servidor UNO rodando em {HOST}:{PORT}")
 # Valor: Dicionário {'estado': Objeto EstadoJogo, 'clientes': Lista de sockets conectados}
 salas = {} 
 
-def broadcast_sala(nome_sala, mensagem):
+def broadcast_sala(nome_sala, estado):
     """
     Envia uma mensagem para todos os jogadores conectados em uma sala específica.
     Útil para atualizar o estado do jogo para todos ao mesmo tempo.
@@ -42,7 +42,7 @@ def broadcast_sala(nome_sala, mensagem):
     
     sala = salas[nome_sala]
     # Serializa a mensagem apenas uma vez para eficiência (pickle é custoso)
-    data = pickle.dumps(mensagem)
+    data = pickle.dumps(estado)
     
     for cliente in sala['clientes']:
         try:
@@ -90,7 +90,7 @@ def handle_client(conn, addr):
                     else:
                         # Cria nova sala com estado inicial padrão
                         salas[nome] = {
-                            'estado': EstadoJogo('PADRAO'), 
+                            'estado': EstadoJogo(), 
                             'clientes': []
                         }
                         conn.send(pickle.dumps({'tipo': 'SUCESSO_CRIAR'}))
@@ -229,7 +229,7 @@ def handle_client(conn, addr):
     finally:
         # --- LIMPEZA AO DESCONECTAR ---
         # Garante que o jogador seja removido corretamente se a conexão cair
-        if sala_atual and sala_atual in salas:
+        if sala_atual in salas:
             sala = salas[sala_atual]
             estado = sala['estado']
             

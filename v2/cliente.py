@@ -7,13 +7,13 @@ renderização das telas (Lobby, Sala de Espera, Jogo), tratamento de eventos (c
 e sincronização de estado via rede.
 """
 
-import pygame   # Biblioteca para criação de jogos (gráficos, eventos, som)
-import socket   # Biblioteca para comunicação de rede (TCP/IP)
-import pickle   # Biblioteca para serialização de objetos (enviar dados complexos pela rede)
+import pygame    # Biblioteca para criação de jogos (gráficos, eventos, som)
+import socket    # Biblioteca para comunicação de rede (TCP/IP)
+import pickle    # Biblioteca para serialização de objetos (enviar dados complexos pela rede)
 import threading # Biblioteca para rodar processos em paralelo (escutar o servidor sem travar o jogo)
-import math     # Funções matemáticas (usado para desenhar setas e cálculos geométricos)
-import time     # Funções de tempo (delay, controle de FPS)
-import sys      # Funções do sistema (encerrar o programa)
+import math      # Funções matemáticas (usado para desenhar setas e cálculos geométricos)
+import time      # Funções de tempo (delay, controle de FPS)
+import sys       # Funções do sistema (encerrar o programa)
 # Importa as constantes e classes compartilhadas do protocolo
 from protocolo import EstadoJogo, MSG_CRIAR_SALA, MSG_ENTRAR_SALA, MSG_LISTAR_SALAS, MSG_INICIAR_JOGO, MSG_GRITAR_UNO, MSG_SAIR_SALA, MSG_ERRO
 
@@ -71,12 +71,12 @@ FONT_CARTA_PQ = pygame.font.SysFont('Arial', 14, bold=True)  # Símbolo pequeno 
 
 # --- ESTADO DO CLIENTE ---
 # Variáveis globais que armazenam o estado atual do jogo no cliente
-estado_local = None       # Cópia do objeto EstadoJogo recebido do servidor
-meu_id = None             # ID deste cliente (atribuído pelo servidor)
-em_sala = False           # Flag indicando se o cliente está em uma sala ou no lobby
-lista_salas = []          # Lista de salas disponíveis (para o lobby)
-mensagem_erro = ""        # Mensagem de erro para exibir na tela (ex: "Sala cheia")
-escolhendo_cor = False    # Flag para abrir o menu de escolha de cor (Coringa/+4)
+estado_local = None         # Cópia do objeto EstadoJogo recebido do servidor
+meu_id = None               # ID deste cliente (atribuído pelo servidor)
+em_sala = False             # Flag indicando se o cliente está em uma sala ou no lobby
+lista_salas = []            # Lista de salas disponíveis (para o lobby)
+mensagem_erro = ""          # Mensagem de erro para exibir na tela (ex: "Sala cheia")
+escolhendo_cor = False      # Flag para abrir o menu de escolha de cor (Coringa/+4)
 carta_preta_pendente = None # Índice da carta preta que foi clicada (aguardando escolha de cor)
 
 # --- CLASSES AUXILIARES ---
