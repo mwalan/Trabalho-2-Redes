@@ -41,13 +41,13 @@ O principal desafio abordado foi a sincronização de estado em tempo real entre
     O servidor deve ser o primeiro a ser iniciado. Ele ficará escutando na porta 5555.
 
     ```bash
-    python3 v2/servidor.py
+    python3 servidor.py
     ```
 
 4.  **Execute o cliente:**
     Abra novos terminais para cada jogador que deseja conectar.
     ```bash
-    python3 v2/cliente.py
+    python3 cliente.py
     ```
     - Ao iniciar, o cliente pedirá o IP do servidor. Se estiver rodando localmente, apenas pressione **Enter** para usar `localhost`. Caso contrário coloque o **IPv4** da máquina que está rodando o servidor.
 
